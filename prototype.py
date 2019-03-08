@@ -11,6 +11,11 @@ s.auth = ('user', 'pw')
 def get_data(name):
   print("About " + name + "\n")
 
+  if "-" not in name:
+    print("Incorrect format")
+    print("Needs form: <ticker symbol>-<country code>")
+    return
+
 # <http|s>://[<email>:<password>@]
 # api.capitalcube.com/<resource>[/subresource...][?<parameters>]
   url = "https://api.capitalcube.com/companies/" +name
@@ -20,7 +25,16 @@ def get_data(name):
 
   if(resp.ok):
     print(resp)
-    data = resp.json()
+
+    #Try to open data, if not a json - failed query
+
+    #need to check which exchange a company is in, retrieve id if not NASDQ
+    #add check for if country code entered etc before sending request
+    try:
+      data = resp.json()
+    except json.decoder.JSONDecodeError:
+      print("Enter valid NASDQ or exchange ticker")
+      return
 
     # Print market cap
     print(data["marketCap"])

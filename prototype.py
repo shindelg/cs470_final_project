@@ -2,7 +2,8 @@ import urllib
 import json
 import sys
 import requests
-# from bs4 import BeautifulSoup as bs
+import csv
+from collections import OrderedDict
 
 # Auth
 s = requests.Session()
@@ -13,39 +14,33 @@ def get_data(name):
 
 # <http|s>://[<email>:<password>@]
 # api.capitalcube.com/<resource>[/subresource...][?<parameters>]
+  # print(requests.__version__)
+
+  # get url response
   url = "https://api.capitalcube.com/companies/" +name
   resp = requests.get(url)
 
-  info = dict()
-
   if(resp.ok):
-    print(resp)
-    data = resp.json()
+  
+    data = resp.json() 
 
-    # Print market cap
-    print(data["marketCap"])
+    # test column order
+    # data = {"col0":0, "col1":1,"col2":2, "col3":3,"col4":4, "col5":5}
+    
+    info = OrderedDict(sorted(data.items(), key=lambda t : t[0]))
 
-    # Print whole data of a company
-    for key, val in data.items():
+    # print whole data of a company
+    for key, val in info.items():
       info[key] = val
       print(key + "  : " +str(val))
-
     print("\n\n")
 
-  # Get peers?
-  # url2 = "https://api.capitalcube.com/companies/" +name +"/peers"
-  # resp2 = requests.get(url2)
-
-  # peers = dict()
-  #
-  # if(resp2.ok):
-  #   print(resp2)
-  #   data = resp2.json()
-
-    # for key, val in data.items():
-    #   peers[key] = val
-    #   print(key)
-
+    # write in csv
+    with open('test.csv', 'w+') as csvfile:
+      writer = csv.writer(csvfile)
+      writer.writerow(info.keys())
+      writer.writerow(info.values())
+  
 def main(argv):
   get_data(argv)
 

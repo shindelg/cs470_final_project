@@ -9,53 +9,49 @@ from collections import OrderedDict
 s = requests.Session()
 s.auth = ('user', 'pw')
 
-def get_data(name):
-  print("About " + name + "\n")
+def get_data(companies):
 
-  if "-" not in name:
-    print("Incorrect format")
-    print("Needs form: <ticker symbol>-<country code>")
-    return
+  print("About " + companies + "\n")
 
-# <http|s>://[<email>:<password>@]
-# api.capitalcube.com/<resource>[/subresource...][?<parameters>]
-  # print(requests.__version__)
+  compList = [x.strip() for x in companies.split(",")]
 
-  # get url response
-  url = "https://api.capitalcube.com/companies/" +name
-  resp = requests.get(url)
-
-  if(resp.ok):
-    print(resp)
-
-    #Try to open data, if not a json - failed query
-
-    #need to check which exchange a company is in, retrieve id if not NASDQ
-    #add check for if country code entered etc before sending request
-    try:
-      data = resp.json()
-    except json.decoder.JSONDecodeError:
-      print("Enter valid NASDQ or exchange ticker")
+  for name in compList:
+    if "-" not in name:
+      print("Incorrect format")
+      print("Needs form: <ticker symbol>-<country code>")
       return
 
-    data = resp.json()
+    # Get url response
+    url = "https://api.capitalcube.com/companies/" +name
+    resp = requests.get(url)
 
-    # test column order
-    # data = {"col0":0, "col1":1,"col2":2, "col3":3,"col4":4, "col5":5}
+    if(resp.ok):
+      print(resp)
 
-    info = OrderedDict(sorted(data.items(), key=lambda t : t[0]))
+      #Try to open data, if not a json - failed query
 
-    # print whole data of a company
-    for key, val in info.items():
-      info[key] = val
-      print(key + "  : " +str(val))
-    print("\n\n")
+      #need to check which exchange a company is in, retrieve id if not NASDQ
+      #add check for if country code entered etc before sending request
+      try:
+        data = resp.json()
+      except json.decoder.JSONDecodeError:
+        print("Enter valid NASDQ or exchange ticker")
+        return
 
-    # write in csv
-    with open('test.csv', 'w+') as csvfile:
-      writer = csv.writer(csvfile)
-      writer.writerow(info.keys())
-      writer.writerow(info.values())
+      # data = resp.json()
+      info = OrderedDict(sorted(data.items(), key=lambda t : t[0]))
+
+      # for key, val in info.items():
+      #   info[key] = val
+      #   print(key + "  : " +str(val))
+      # print("\n\n")
+      
+      # Create a csv
+      # Possible issue: same company is added as a new row if run again
+      with open('test.csv', 'a+') as csvfile:
+        headers = info.keys()
+        writer = csv.DictWriter(csvfile, fieldnames=headers)
+        writer.writerow(info)
 
 def main(argv):
   get_data(argv)

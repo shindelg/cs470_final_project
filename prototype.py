@@ -14,7 +14,7 @@ def get_data(name):
   if "-" not in name:
     print("Incorrect format")
     print("Needs form: <ticker symbol>-<country code>")
-    return
+    return(False)
 
 # <http|s>://[<email>:<password>@]
 # api.capitalcube.com/<resource>[/subresource...][?<parameters>]
@@ -34,7 +34,7 @@ def get_data(name):
       data = resp.json()
     except json.decoder.JSONDecodeError:
       print("Enter valid NASDQ or exchange ticker")
-      return
+      return(False)
 
     # Print market cap
     print(data["marketCap"])
@@ -45,6 +45,7 @@ def get_data(name):
       print(key + "  : " +str(val))
 
     print("\n\n")
+    return(True)
 
   # Get peers?
   # url2 = "https://api.capitalcube.com/companies/" +name +"/peers"
@@ -60,7 +61,7 @@ def get_data(name):
     #   peers[key] = val
     #   print(key)
 
-def main(argv):
-  get_data(argv)
+#def main(argv):
+#  get_data(argv)
 
-main(sys.argv[1])
+#main(sys.argv[1])

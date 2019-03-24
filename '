@@ -1,0 +1,11 @@
+import * from  prototype.py
+import csv
+
+def check_tickers(fileName):
+
+    with open(fileName, newline=='') as csvfile:
+        reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        for row in reader:
+            print(', '.join(row))
+
+

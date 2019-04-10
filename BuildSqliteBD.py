@@ -74,26 +74,31 @@ TickerSymbol VARCHAR(20),
 FinancesCurrency VARCHAR(20),
 MarketCapitalizationInUsd INTEGER,
 AnnualRevenueInUsd INTEGER,
-FinancesCurrentAsOf INTEGER
+FinancesCurrentAsOf VARCHAR(20)
 );"""
-
-
-
 
 # execute the statement
 crsr.execute(sql_command)
 
-# df = pandas.read_csv('publicComp.csv')
-# df.to_sql(PublicCompany, connection, if_exists='append', index=False)
+sql_command = """CREATE TABLE UpdatedPublicCompany (
+CompanyId INTEGER PRIMARY KEY,
+CompanyName VARCHAR(100),
+TickerSymbol VARCHAR(20),
+FinancesCurrency VARCHAR(20),
+MarketCapitalizationInUsd INTEGER,
+AnnualRevenueInUsd INTEGER,
+FinancesCurrentAsOf INTEGER
+);"""
 
+# execute the statement
+crsr.execute(sql_command)
+
+#This loads the data in from the csv into the PublicCompany Table
 with open('publicComp.csv', 'rt') as fin:
     dr = csv.DictReader(fin)
     to_db = [(i['CompanyId'], i['CompanyName'], i['TickerSymbol'], i['FinancesCurrency'], i['MarketCapitalizationInUsd'], i['AnnualRevenueInUsd'], i['FinancesCurrentAsOf']) for i in dr]
 
 connection.executemany("INSERT INTO PublicCompany (CompanyId, CompanyName, TickerSymbol, FinancesCurrency,MarketCapitalizationInUsd,AnnualRevenueInUsd, FinancesCurrentAsOf ) VALUES (?,?,?,?,?,?,?);", to_db)
-#Import data into temp db
-# crsr.execute("INSERT INTO PublicCompany "/publicComp.csv";)
-
 
 # To save the changes in the files. Never skip this.
 # If we skip this, nothing will be saved in the database.

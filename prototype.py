@@ -3,6 +3,7 @@ import json
 import sys
 import requests
 import csv
+import os
 from collections import OrderedDict
 
 # Auth
@@ -41,17 +42,26 @@ def get_data(companies):
       # data = resp.json()
       info = OrderedDict(sorted(data.items(), key=lambda t : t[0]))
 
-      # for key, val in info.items():
-      #   info[key] = val
-      #   print(key + "  : " +str(val))
-      # print("\n\n")
-      
+      for key, val in info.items():
+        info[key] = val
+        print(key + "  : " +str(val))
+      print("\n\n")
+
       # Create a csv
       # Possible issue: same company is added as a new row if run again
-      with open('test.csv', 'a+') as csvfile:
+      with open('test2.csv', 'a+') as csvfile:
         headers = info.keys()
+        # writer.writeheader()
         writer = csv.DictWriter(csvfile, fieldnames=headers)
-        writer.writerow(info)
+        with open('test2.csv', 'r') as f:
+          reader = [i for i in csv.DictReader(f)]
+          if len(reader) == 0:
+            writer.writeheader()
+          if name in reader:
+            continue
+          else:
+            writer.writerow(info)
+          
 
 def main(argv):
   get_data(argv)

@@ -11,8 +11,9 @@ connection = sqlite3.connect("Temp_ForestTrends.db")
 crsr = connection.cursor()
 
 # SQL command to Drop Tables
-crsr.execute(" Drop table if exists PublicCompany; ")
-
+crsr.execute(" Drop table if exists FTData; ")
+crsr.execute(" Drop table if exists NewData; ")
+crsr.execute(" Drop table if exists Tickers; ")
 
 # To save the changes in the files. Never skip this.
 # If we skip this, nothing will be saved in the database.

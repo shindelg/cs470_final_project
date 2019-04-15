@@ -19,7 +19,7 @@ TickerSymbol VARCHAR(20),
 FinancesCurrency VARCHAR(20),
 MarketCapitalizationInUsd INTEGER,
 AnnualRevenueInUsd INTEGER,
-FinancesCurrentAsOf VARCHAR(20)
+FinancesCurrentAsOf DATE
 );"""
 
 # Function to create a table of just the ticker symbols, to be standardized
@@ -35,19 +35,32 @@ TickerSymbol VARCHAR(20),
 FinancesCurrency VARCHAR(20),
 MarketCapitalizationInUsd INTEGER,
 AnnualRevenueInUsd INTEGER,
-FinancesCurrentAsOf INTEGER
+FinancesCurrentAsOf DATE
 );"""
 
 # Create the FTData Table for loading in unfiltered data
 crsr.execute(CreateFT)
 
-# This loads the data in from the ForestTrends csv into the FTData Table
+# This loads the data in from the ForestTrends csv into the FTData Table publicComp.csv
 with open('publicComp.csv', 'rt') as fin:
     dr = csv.DictReader(fin)
     to_db = [(i['CompanyId'], i['CompanyName'], i['TickerSymbol'], i['FinancesCurrency'], i['MarketCapitalizationInUsd'], i['AnnualRevenueInUsd'], i['FinancesCurrentAsOf']) for i in dr]
 
 # Insert values from the ForestTrends csv into the FTData Table
 connection.executemany("INSERT INTO FTData (CompanyId, CompanyName, TickerSymbol, FinancesCurrency,MarketCapitalizationInUsd,AnnualRevenueInUsd, FinancesCurrentAsOf ) VALUES (?,?,?,?,?,?,?);", to_db)
+
+
+# Create the New Data table to insert new data from Capital Cube
+crsr.execute(CreateNewData)
+
+# This loads the data in from the Updated csv into the NewData Table
+with open('newdata.csv', 'rt') as fin:
+    dr = csv.DictReader(fin)
+    to_db = [(i['CompanyId'], i['CompanyName'], i['TickerSymbol'], i['FinancesCurrency'], i['MarketCapitalizationInUsd'], i['AnnualRevenueInUsd'], i['FinancesCurrentAsOf']) for i in dr]
+
+# Insert values from the newdata csv into the NewData Table
+connection.executemany("INSERT INTO NewData (CompanyId, CompanyName, TickerSymbol, FinancesCurrency,MarketCapitalizationInUsd,AnnualRevenueInUsd, FinancesCurrentAsOf ) VALUES (?,?,?,?,?,?,?);", to_db)
+
 
 # Create the Tickers table for standardizing ticker symbols
 crsr.execute(CreateTickers)
@@ -61,9 +74,6 @@ newTickers= crsr.fetchall()
 # Insert the filtered tickers into the Tickers table
 for i in newTickers:
 	crsr.execute("INSERT INTO Tickers (TickerSymbol) VALUES (?);", i)
-
-# Create the New Data table to insert new data from Yahoo Finance
-crsr.execute(CreateNewData)
 
 # To save the changes in the files. Never skip this.
 # If we skip this, nothing will be saved in the database.

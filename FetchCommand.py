@@ -13,7 +13,6 @@ crsr = connection.cursor()
 #crsr.execute("SELECT * FROM PublicCompany")
 #crsr.execute("SELECT * FROM NewData")
 
-
 # Function is to compare two tables within sqlite database
 QueryOne = """SELECT NewData.CompanyId, NewData.CompanyName, NewData.TickerSymbol, NewData.FinancesCurrency, NewData.MarketCapitalizationInUsd, NewData.AnnualRevenueInUsd, NewData.FinancesCurrentAsOf, FTData.MarketCapitalizationInUsd, FTData.AnnualRevenueInUsd
 FROM NewData JOIN FTData
@@ -22,7 +21,7 @@ AND (NewData.MarketCapitalizationInUsd != FTData.MarketCapitalizationInUsd
 OR NewData.AnnualRevenueInUsd != FTData.AnnualRevenueInUsd)
 ;"""
 
-crsr.execute(QueryOne)
+#crsr.execute(QueryOne)
 
 # Output to a csv
 fields = ['CompanyId', 'CompanyName', 'TickerSymbol', 'FinancesCurrency', 'Updated MarketCapitalizationInUsd', 'Updated AnnualRevenueInUsd', 'FinancesCurrentAsOf', 'Original MarketCapitalizationInUsd', 'Original AnnualRevenueInUsd',]
@@ -35,9 +34,9 @@ with open('UpdatedCompanyInformation.csv', 'w+') as f:
 
 
 
-# store all the fetched data in the ans variable
-ans= crsr.fetchall()
-
-# loop to print all the data
-for i in ans:
-    print(i)
+# # store all the fetched data in the ans variable
+# ans= crsr.fetchall()
+#
+# # loop to print all the data
+# for i in ans:
+#     print(i)

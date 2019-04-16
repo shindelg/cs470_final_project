@@ -24,19 +24,10 @@ OR NewData.AnnualRevenueInUsd != FTData.AnnualRevenueInUsd)
 #crsr.execute(QueryOne)
 
 # Output to a csv
-fields = ['CompanyId', 'CompanyName', 'TickerSymbol', 'FinancesCurrency', 'Updated MarketCapitalizationInUsd', 'Updated AnnualRevenueInUsd', 'FinancesCurrentAsOf', 'Original MarketCapitalizationInUsd', 'Original AnnualRevenueInUsd',]
+fields = ['CompanyId', 'CompanyName', 'TickerSymbol', 'FinancesCurrency', 'Updated MarketCapitalizationInUsd', 'Updated AnnualRevenueInUsd', 'Upaded FinancesCurrentAsOf', 'Original MarketCapitalizationInUsd', 'Original AnnualRevenueInUsd',]
 toExport = crsr.execute(QueryOne)
 
 with open('UpdatedCompanyInformation.csv', 'w+') as f:
     writer = csv.writer(f)
     writer.writerows([(fields)])
     writer.writerows(toExport)
-
-
-
-# # store all the fetched data in the ans variable
-# ans= crsr.fetchall()
-#
-# # loop to print all the data
-# for i in ans:
-#     print(i)

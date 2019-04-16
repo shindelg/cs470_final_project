@@ -15,6 +15,8 @@ crsr.execute(" Drop table if exists FTData; ")
 crsr.execute(" Drop table if exists NewData; ")
 crsr.execute(" Drop table if exists Tickers; ")
 
+print("Successfully Dropped all tables from Database")
+
 # To save the changes in the files. Never skip this.
 # If we skip this, nothing will be saved in the database.
 connection.commit()

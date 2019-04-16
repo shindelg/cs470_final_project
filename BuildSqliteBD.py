@@ -1,9 +1,10 @@
 # Importing module
 import sqlite3, csv
-# Import "./publicComp.csv"
 
 # Connecting to the database
+
 connection = sqlite3.connect("Temp_ForestTrends.db")
+print("Connected to Temp_ForestTrends Database")
 
 # Cursor
 crsr = connection.cursor()
@@ -40,6 +41,7 @@ FinancesCurrentAsOf DATE
 
 # Create the FTData Table for loading in unfiltered data
 crsr.execute(CreateFT)
+
 
 # This loads the data in from the ForestTrends csv into the FTData Table publicComp.csv
 with open('publicComp.csv', 'rt') as fin:

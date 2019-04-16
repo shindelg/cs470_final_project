@@ -10,13 +10,32 @@ from collections import OrderedDict
 s = requests.Session()
 s.auth = ('user', 'pw')
 
-def get_data(companies):
+def get_data(companiesCSV):
+  
+  companies = []
+  with open(companiesCSV, 'r') as rd:
+    companies = [str(s) for line in rd.readlines() for s in line[:-1].split(',')]
 
-  print("About " + companies + "\n")
+#   print(companies)
+  
+  # Delete files from previous API call
+  failedExists = os.path.isfile("./FailedTicker.csv")
+  successExists = os.path.isfile("./Success.csv")
 
-  compList = [x.strip() for x in companies.split(",")]
-
-  for name in compList:
+  if failedExists:
+    os.remove("FailedTicker.csv")
+  if successExists:
+    os.remove("Success.csv")
+  
+  # Create FailedTicker.csv for failed tickers 
+  wrongTickerFile = csv.writer(open('FailedTicker.csv', 'a+'))
+  wrongTickerFile.writerow([str("WrongTickers")])
+  
+  # Iterate through each company
+  for name in companies:
+    if name == "Tickers":
+      continue
+      
     if "-" not in name:
       print("Incorrect format")
       print("Needs form: <ticker symbol>-<country code>")
@@ -30,40 +49,34 @@ def get_data(companies):
       print(resp)
 
       #Try to open data, if not a json - failed query
-
-      #need to check which exchange a company is in, retrieve id if not NASDQ
-      #add check for if country code entered etc before sending request
       try:
         data = resp.json()
       except json.decoder.JSONDecodeError:
         print("Enter valid NASDQ or exchange ticker")
-        return
+    
+        wrongTickerFile.writerow([str(name)])
+        continue
 
-      # data = resp.json()
       info = OrderedDict(sorted(data.items(), key=lambda t : t[0]))
 
-      for key, val in info.items():
-        info[key] = val
-        print(key + "  : " +str(val))
-      print("\n\n")
+    #   for key, val in info.items():
+    #     info[key] = val
+    #     print(key + "  : " +str(val))
+    #   print("\n\n")
 
-      # Create a csv
-      # Possible issue: same company is added as a new row if run again
-      with open('test2.csv', 'a+') as csvfile:
-        headers = info.keys()
-        # writer.writeheader()
-        writer = csv.DictWriter(csvfile, fieldnames=headers)
-        with open('test2.csv', 'r') as f:
-          reader = [i for i in csv.DictReader(f)]
+      headers = info.keys()
+
+      with open('Success.csv', 'a+') as ff1:
+        writer = csv.DictWriter(ff1, fieldnames=headers)
+        with open('Success.csv', 'r') as ff2:
+          reader = [i for i in csv.DictReader(ff2)]
           if len(reader) == 0:
             writer.writeheader()
-          if name in reader:
-            continue
+            writer.writerow(info)
           else:
             writer.writerow(info)
-          
 
-def main(argv):
-  get_data(argv)
+def main():
+  get_data("inputCSV.csv")
 
-main(sys.argv[1])
+main()

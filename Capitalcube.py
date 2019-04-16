@@ -16,6 +16,7 @@ def retrieve_data(tickerCSV):
   totalRow = df.shape[0] 
   print("Total ", totalRow, "company information requested")
   
+  # TODO Reformat columns and information when retrieving data from Capitalcube?
   # columns = ['TickerSymbol', 'Name', 'HeadquarterCountry', 'PublicOrPrivate', 'Sector', 
   # 'Industry', 'MarketCapitalization', 'AnnualRevenue', 'FinancesCurrency', 'Exchange', 
   # 'MarketCapitalizationInUsd', 'AnnualRevenueInUsd', 'FinancesCurrentAsOf', 'Profile', 'LastUpdated']
@@ -26,8 +27,8 @@ def retrieve_data(tickerCSV):
   failed = []
 
   for index, name in df.itertuples():  
-    print(name)
-    
+
+    # TODO Throws error when ticker includes spaces (ex. HM B-SE)
     if "-" not in name:
       print("Incorrect format")
       print("Needs form: <ticker symbol>-<country code>")
@@ -78,11 +79,23 @@ def retrieve_data(tickerCSV):
         success.append(data)
 
   failedDataset = pd.DataFrame.from_dict(failed, orient='columns')
-  failedDataset.to_csv("FailedTickers.csv", index=False)
+  failedDataset.to_csv("FailedTickers.csv", index=False) # Failed tickers csv
   successDataset = pd.DataFrame.from_dict(success, orient='columns')
-  successDataset.to_csv("SuccessTickers.csv", index=False)
+  successDataset.to_csv("SuccessTickers.csv", index=False) # Successful tickers with information csv
 
 def main():
+  # input file (list of Tickers with the header "Tickers")
   retrieve_data("output.csv")
 
 main()
+
+'''
+Input file should start with the header "Tickers"
+
+output.csv file example:
+
+Tickers
+MMM-US
+DSY-FR
+AAA-SE
+'''

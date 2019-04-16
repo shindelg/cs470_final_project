@@ -14,6 +14,7 @@ crsr = connection.cursor()
 crsr.execute(" Drop table if exists FTData; ")
 crsr.execute(" Drop table if exists NewData; ")
 crsr.execute(" Drop table if exists Tickers; ")
+crsr.execute(" Drop table if exists CapitalCubeData; ")
 
 print("Successfully Dropped all tables from Database")
 

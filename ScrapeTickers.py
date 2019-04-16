@@ -1,6 +1,5 @@
 # Importing module
 import sqlite3, csv
-# Import "./publicComp.csv"
 
 # Connecting to the database
 connection = sqlite3.connect("Temp_ForestTrends.db")
@@ -19,7 +18,7 @@ TickerSymbol VARCHAR(20),
 FinancesCurrency VARCHAR(20),
 MarketCapitalizationInUsd INTEGER,
 AnnualRevenueInUsd INTEGER,
-FinancesCurrentAsOf VARCHAR(20)
+FinancesCurrentAsOf DATETIME
 );"""
 
 # Function to create a table of just the ticker symbols, to be standardized
@@ -56,7 +55,7 @@ toExport = crsr.execute("SELECT * FROM Tickers")
 
 with open('output.csv', 'w+') as f:
     writer = csv.writer(f)
-    writer.writerow(['TickerSymbol'])
+    writer.writerow(['Tickers'])
     writer.writerows(toExport)
 
 

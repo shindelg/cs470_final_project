@@ -80,3 +80,15 @@ def main():
   get_data("inputCSV.csv")
 
 main()
+
+"""
+Example "inputCSV.csv" format:
+
+Tickers
+MMM-US
+AMC-AU
+WRONG-22
+BARN-CH
+BAS-DE
+
+"""

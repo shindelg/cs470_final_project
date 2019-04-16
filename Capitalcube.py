@@ -70,11 +70,23 @@ def retrieve_data(tickerCSV):
         # print("dinedoen: ", peersList)
         
   failedDataset = pd.DataFrame.from_dict(failed, orient='columns')
-  failedDataset.to_csv("FailedTicker.csv", index=False)
+  failedDataset.to_csv("FailedTickers.csv", index=False)
   successDataset = pd.DataFrame.from_dict(success, orient='columns')
-  successDataset.to_csv("Success.csv", index=False)
+  successDataset.to_csv("SuccessTickers.csv", index=False)
 
 def main():
   retrieve_data("inputCSV.csv")
 
 main()
+
+"""
+Example "inputCSV.csv" format:
+
+Tickers
+MMM-US
+AMC-AU
+WRONG-22
+BARN-CH
+BAS-DE
+
+"""

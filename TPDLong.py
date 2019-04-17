@@ -78,7 +78,7 @@ other_info= crsr.fetchall()
 connection.executemany("INSERT INTO NewData (CompanyName, TickerSymbol, FinancesCurrency, MarketCapitalizationInUsd, AnnualRevenueInUsd, FinancesCurrentAsOf, Peers) VALUES (?,?,?,?,?,?,?)", other_info)
 
 # Function is to compare two tables within sqlite database
-QueryOne = """SELECT FTData.CompanyId, NewData.CompanyName, NewData.TickerSymbol, NewData.FinancesCurrency, NewData.MarketCapitalizationInUsd, NewData.AnnualRevenueInUsd, NewData.FinancesCurrentAsOf, NewData.Peers, FTData.MarketCapitalizationInUsd, FTData.AnnualRevenueInUsd
+QueryOne = """SELECT DISTINCT FTData.CompanyId, NewData.CompanyName, FTData.CompanyName ,NewData.TickerSymbol, NewData.FinancesCurrency, NewData.MarketCapitalizationInUsd, NewData.AnnualRevenueInUsd, NewData.FinancesCurrentAsOf, NewData.Peers, FTData.MarketCapitalizationInUsd, FTData.AnnualRevenueInUsd
 FROM NewData JOIN FTData
 WHERE NewData.TickerSymbol = FTData.TickerSymbol
 AND (NewData.MarketCapitalizationInUsd != FTData.MarketCapitalizationInUsd
@@ -88,7 +88,7 @@ OR NewData.AnnualRevenueInUsd != FTData.AnnualRevenueInUsd)
 #crsr.execute(QueryOne)
 
 # Output to a csv
-fields = ['CompanyId', 'CompanyName', 'TickerSymbol', 'FinancesCurrency', 'Updated MarketCapitalizationInUsd', 'Updated AnnualRevenueInUsd', 'Upaded FinancesCurrentAsOf', 'Peers', 'Original MarketCapitalizationInUsd', 'Original AnnualRevenueInUsd',]
+fields = ['CompanyId', 'CompanyName', 'Name in ForestTrends DB','TickerSymbol', 'FinancesCurrency', 'Updated MarketCapitalizationInUsd', 'Updated AnnualRevenueInUsd', 'Upaded FinancesCurrentAsOf', 'Peers', 'Original MarketCapitalizationInUsd', 'Original AnnualRevenueInUsd',]
 toExport = crsr.execute(QueryOne)
 
 with open('UpdatedCompanyInformation.csv', 'w+') as f:

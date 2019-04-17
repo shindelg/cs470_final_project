@@ -2,66 +2,91 @@ import urllib
 import json
 import sys
 import requests
-# from bs4 import BeautifulSoup as bs
+import csv
+import os
+from collections import OrderedDict
 
 # Auth
 s = requests.Session()
 s.auth = ('user', 'pw')
 
-def get_data(name):
-  print("About " + name + "\n")
+def get_data(companiesCSV):
 
-  if "-" not in name:
-    print("Incorrect format")
-    print("Needs form: <ticker symbol>-<country code>")
-    return(False)
+  companies = []
+  with open(companiesCSV, 'r') as rd:
+    companies = [str(s) for line in rd.readlines() for s in line[:-1].split(',')]
 
-# <http|s>://[<email>:<password>@]
-# api.capitalcube.com/<resource>[/subresource...][?<parameters>]
-  url = "https://api.capitalcube.com/companies/" +name
-  resp = requests.get(url)
+#   print(companies)
 
-  info = dict()
+  # Delete files from previous API call
+  failedExists = os.path.isfile("./FailedTicker.csv")
+  successExists = os.path.isfile("./Success.csv")
 
-  if(resp.ok):
-    print(resp)
+  if failedExists:
+    os.remove("FailedTicker.csv")
+  if successExists:
+    os.remove("Success.csv")
 
-    #Try to open data, if not a json - failed query
+  # Create FailedTicker.csv for failed tickers
+  wrongTickerFile = csv.writer(open('FailedTicker.csv', 'a+'))
+  wrongTickerFile.writerow([str("WrongTickers")])
 
-    #need to check which exchange a company is in, retrieve id if not NASDQ
-    #add check for if country code entered etc before sending request
-    try:
-      data = resp.json()
-    except json.decoder.JSONDecodeError:
-      print("Enter valid NASDQ or exchange ticker")
-      return(False)
+  # Iterate through each company
+  for name in companies:
+    if name == "TickerSymbol":
+      continue
 
-    # Print market cap
-    print(data["marketCap"])
+    if "-" not in name:
+      print("Incorrect format")
+      print("Needs form: <ticker symbol>-<country code>")
+      return
 
-    # Print whole data of a company
-    for key, val in data.items():
-      info[key] = val
-      print(key + "  : " +str(val))
+    # Get url response
+    url = "https://api.capitalcube.com/companies/" +name
+    resp = requests.get(url)
 
-    print("\n\n")
-    return(True)
+    if(resp.ok):
+      print(resp)
 
-  # Get peers?
-  # url2 = "https://api.capitalcube.com/companies/" +name +"/peers"
-  # resp2 = requests.get(url2)
+      #Try to open data, if not a json - failed query
+      try:
+        data = resp.json()
+      except json.decoder.JSONDecodeError:
+        print("Enter valid NASDQ or exchange ticker")
 
-  # peers = dict()
-  #
-  # if(resp2.ok):
-  #   print(resp2)
-  #   data = resp2.json()
+        wrongTickerFile.writerow([str(name)])
+        continue
 
-    # for key, val in data.items():
-    #   peers[key] = val
-    #   print(key)
+      info = OrderedDict(sorted(data.items(), key=lambda t : t[0]))
 
-#def main(argv):
-#  get_data(argv)
+    #   for key, val in info.items():
+    #     info[key] = val
+    #     print(key + "  : " +str(val))
+    #   print("\n\n")
 
-#main(sys.argv[1])
+      headers = info.keys()
+
+      with open('Success.csv', 'a+') as ff1:
+        writer = csv.DictWriter(ff1, fieldnames=headers)
+        with open('Success.csv', 'r') as ff2:
+          reader = [i for i in csv.DictReader(ff2)]
+          if len(reader) == 0:
+            writer.writeheader()
+            writer.writerow(info)
+          else:
+            writer.writerow(info)
+
+def main():
+  get_data("output.csv")
+
+main()
+
+# """
+# Example "inputCSV.csv" format:
+# Tickers
+# MMM-US
+# AMC-AU
+# WRONG-22
+# BARN-CH
+# BAS-DE
+# """

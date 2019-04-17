@@ -63,9 +63,9 @@ crsr.execute("SELECT CompanyId FROM FTData;")
 # Set up company IDs to be inserted
 comp_ids= crsr.fetchall()
 
-# Insert the company IDs into NewData by iterating through our list
-for x in comp_ids:
-	crsr.execute("INSERT INTO NewData (CompanyId) VALUES (?);", x)
+# # Insert the company IDs into NewData by iterating through our list
+# for x in comp_ids:
+# 	crsr.execute("INSERT INTO NewData (CompanyId) VALUES (?);", x)
 
 # Filter out relevant data from CapitalCube into our NewData table
 # fiftyTwoWeekLow is a placeholder for when we can actually get the annual revenue of a company
@@ -78,9 +78,9 @@ other_info= crsr.fetchall()
 connection.executemany("INSERT INTO NewData (CompanyName, TickerSymbol, FinancesCurrency, MarketCapitalizationInUsd, AnnualRevenueInUsd, FinancesCurrentAsOf, Peers) VALUES (?,?,?,?,?,?,?)", other_info)
 
 # Function is to compare two tables within sqlite database
-QueryOne = """SELECT NewData.CompanyId, NewData.CompanyName, NewData.TickerSymbol, NewData.FinancesCurrency, NewData.MarketCapitalizationInUsd, NewData.AnnualRevenueInUsd, NewData.FinancesCurrentAsOf, NewData.Peers, FTData.MarketCapitalizationInUsd, FTData.AnnualRevenueInUsd
+QueryOne = """SELECT FTData.CompanyId, NewData.CompanyName, NewData.TickerSymbol, NewData.FinancesCurrency, NewData.MarketCapitalizationInUsd, NewData.AnnualRevenueInUsd, NewData.FinancesCurrentAsOf, NewData.Peers, FTData.MarketCapitalizationInUsd, FTData.AnnualRevenueInUsd
 FROM NewData JOIN FTData
-WHERE NewData.CompanyId = FTData.CompanyId
+WHERE NewData.TickerSymbol = FTData.TickerSymbol
 AND (NewData.MarketCapitalizationInUsd != FTData.MarketCapitalizationInUsd
 OR NewData.AnnualRevenueInUsd != FTData.AnnualRevenueInUsd)
 ;"""

@@ -1,3 +1,4 @@
+
 import json
 import requests
 import sys
@@ -13,26 +14,26 @@ s.auth = ('user', 'pw')
 def retrieve_data(tickerCSV):
 
   df = pd.read_csv(tickerCSV)
-  totalRow = df.shape[0] 
+  totalRow = df.shape[0]
   print("Total ", totalRow, "company information requested")
-  
+
   # TODO Reformat columns and information when retrieving data from Capitalcube?
-  # columns = ['TickerSymbol', 'Name', 'HeadquarterCountry', 'PublicOrPrivate', 'Sector', 
-  # 'Industry', 'MarketCapitalization', 'AnnualRevenue', 'FinancesCurrency', 'Exchange', 
+  # columns = ['TickerSymbol', 'Name', 'HeadquarterCountry', 'PublicOrPrivate', 'Sector',
+  # 'Industry', 'MarketCapitalization', 'AnnualRevenue', 'FinancesCurrency', 'Exchange',
   # 'MarketCapitalizationInUsd', 'AnnualRevenueInUsd', 'FinancesCurrentAsOf', 'Profile', 'LastUpdated']
-  
+
   successDataset = pd.DataFrame()
   failedDataset = pd.DataFrame()
   success = []
   failed = []
 
-  for index, name in df.itertuples():  
+  for index, name in df.itertuples():
 
     # TODO Throws error when ticker includes spaces (ex. HM B-SE)
     if "-" not in name:
       print("Incorrect format")
       print("Needs form: <ticker symbol>-<country code>")
-      
+
       if name == 'Subsidiary':
         continue
       else:
@@ -40,9 +41,9 @@ def retrieve_data(tickerCSV):
         continue
 
     # Request for company information
-    url1 = "https://api.capitalcube.com/companies/" +name 
+    url1 = "https://api.capitalcube.com/companies/" +name
     resp1 = requests.get(url1)
-      
+
     if resp1.ok:
       print(resp1)
 
@@ -57,10 +58,10 @@ def retrieve_data(tickerCSV):
       # Request for company peers
       url2 = "https://api.capitalcube.com/companies/" +name +"/peers"
       resp2 = requests.get(url2)
-      
+
       if resp2.ok:
         print("peers:", resp2)
-        
+
         try:
           peersData = resp2.json()
         except json.decoder.JSONDecodeError:
@@ -69,7 +70,7 @@ def retrieve_data(tickerCSV):
 
         peersList = []
         holder = peersData['_links']['cn:peer']
-        
+
         for peerTicker in holder:
           for k, v in peerTicker.items():
             if k == "symbol":

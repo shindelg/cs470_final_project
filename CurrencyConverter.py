@@ -13,7 +13,8 @@ def main():
   c = CurrencyRates()
   currencyData = c.get_rates('USD') 
   df = pd.DataFrame.from_dict(currencyData, orient='index')
-  df.to_csv('CurrencyConverter.csv', header=None)
+  df.columns = ['ExRate']
+  df.to_csv('CurrencyConverter.csv', index_label='Currency')
 
   print("Currency csv created")
   

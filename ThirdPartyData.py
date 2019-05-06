@@ -40,6 +40,14 @@ FinancesCurrentAsOf DATETIME,
 Peers VARCHAR(200)
 );"""
 
+# Function to create the table for exchange rates
+CreateExchangeRate = """CREATE TABLE ExchangeRates (
+Currency VARCHAR(5) PRIMARY KEY,
+ExRate INTEGER,
+CurrentDate Date
+);"""
+
+
 # Cursor object
 crsr = connection.cursor()
 
@@ -57,15 +65,22 @@ connection.executemany("INSERT INTO CapitalCubeData (_links, asOfDate, closingPr
 # Create the NewData table, where we will filter CapitalCube's data
 crsr.execute(CreateNewData)
 
+# Create the ExchangeRate table
+crsr.execute(CreateExchangeRate)
+
+# This loads the data in from the Scraper csv into the CapitalCubeData Table
+with open('exchangeRate.csv', 'rt') as fin:
+    dr = csv.DictReader(fin)
+    to_db = [(i['Currency'], i['ExRate']) for i in dr]
+
+# Insert values into exchangeRate table
+connection.executemany("INSERT INTO ExchangeRates VALUES (?,?, date('now'));", to_db)
+
 # Get the company IDs from FTData separately
 crsr.execute("SELECT CompanyId FROM FTData;")
 
 # Set up company IDs to be inserted
 comp_ids= crsr.fetchall()
-
-# # Insert the company IDs into NewData by iterating through our list
-# for x in comp_ids:
-# 	crsr.execute("INSERT INTO NewData (CompanyId) VALUES (?);", x)
 
 # Filter out relevant data from CapitalCube into our NewData table
 # fiftyTwoWeekLow is a placeholder for when we can actually get the annual revenue of a company
@@ -77,8 +92,13 @@ other_info= crsr.fetchall()
 # Insert the relevant data into NewData
 connection.executemany("INSERT INTO NewData (CompanyName, TickerSymbol, FinancesCurrency, MarketCapitalizationInUsd, AnnualRevenueInUsd, FinancesCurrentAsOf, Peers) VALUES (?,?,?,?,?,?,?)", other_info)
 
+#This alters the table to create a new column
+crsr.execute("ALTER TABLE NewData ADD COLUMN NaviteCurrency INTEGER;")
+
+crsr.execute("UPDATE NewData SET NaviteCurrency = (SELECT ExchangeRates.ExRate from ExchangeRates WHERE ExchangeRates.Currency = NewData.FinancesCurrency) * MarketCapitalizationInUsd")
+
 # Function is to compare two tables within sqlite database
-QueryOne = """SELECT DISTINCT FTData.CompanyId, NewData.CompanyName, FTData.CompanyName ,NewData.TickerSymbol, NewData.FinancesCurrency, NewData.MarketCapitalizationInUsd, NewData.AnnualRevenueInUsd, NewData.FinancesCurrentAsOf, NewData.Peers, FTData.MarketCapitalizationInUsd, FTData.AnnualRevenueInUsd
+QueryOne = """SELECT DISTINCT FTData.CompanyId, FTData.CompanyName ,NewData.TickerSymbol, NewData.FinancesCurrency, NewData.MarketCapitalizationInUsd, NewData.NaviteCurrency, NewData.AnnualRevenueInUsd, NewData.FinancesCurrentAsOf, NewData.Peers, FTData.MarketCapitalizationInUsd, FTData.AnnualRevenueInUsd
 FROM NewData JOIN FTData
 WHERE NewData.TickerSymbol = FTData.TickerSymbol
 AND (NewData.MarketCapitalizationInUsd != FTData.MarketCapitalizationInUsd
@@ -88,7 +108,7 @@ OR NewData.AnnualRevenueInUsd != FTData.AnnualRevenueInUsd)
 #crsr.execute(QueryOne)
 
 # Output to a csv
-fields = ['CompanyId', 'CompanyName', 'Name in ForestTrends DB','TickerSymbol', 'FinancesCurrency', 'Updated MarketCapitalizationInUsd', 'Updated AnnualRevenueInUsd', 'Upaded FinancesCurrentAsOf', 'Peers', 'Original MarketCapitalizationInUsd', 'Original AnnualRevenueInUsd',]
+fields = ['CompanyId', 'CompanyName', 'TickerSymbol', 'FinancesCurrency', 'Updated MarketCapitalizationInUsd','MarketCapitalization in Native Currency','Updated AnnualRevenueInUsd', 'Upaded FinancesCurrentAsOf', 'Peers', 'Original MarketCapitalizationInUsd', 'Original AnnualRevenueInUsd']
 toExport = crsr.execute(QueryOne)
 
 with open('UpdatedCompanyInformation.csv', 'w+') as f:

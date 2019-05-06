@@ -69,7 +69,7 @@ crsr.execute(CreateNewData)
 crsr.execute(CreateExchangeRate)
 
 # This loads the data in from the Scraper csv into the CapitalCubeData Table
-with open('exchangeRate.csv', 'rt') as fin:
+with open('CurrencyConverter.csv', 'rt') as fin:
     dr = csv.DictReader(fin)
     to_db = [(i['Currency'], i['ExRate']) for i in dr]
 

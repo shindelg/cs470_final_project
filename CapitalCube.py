@@ -16,41 +16,34 @@ def retrieve_data(tickerCSV):
   totalRow = df.shape[0]
   print("Total ", totalRow, "company information requested")
 
-  # TODO Reformat columns and information when retrieving data from Capitalcube?
-  # columns = ['TickerSymbol', 'Name', 'HeadquarterCountry', 'PublicOrPrivate', 'Sector',
-  # 'Industry', 'MarketCapitalization', 'AnnualRevenue', 'FinancesCurrency', 'Exchange',
-  # 'MarketCapitalizationInUsd', 'AnnualRevenueInUsd', 'FinancesCurrentAsOf', 'Profile', 'LastUpdated']
-
   successDataset = pd.DataFrame()
   failedDataset = pd.DataFrame()
   success = []
   failed = []
 
   for index, name in df.itertuples():
+    print(name)
 
-    # TODO Throws error when ticker includes spaces (ex. HM B-SE)
     if "-" not in name:
       print("Incorrect format")
       print("Needs form: <ticker symbol>-<country code>")
 
-      if name == 'Subsidiary':
-        continue
-      else:
-        failed.append({'FailedTicker':name})
-        continue
+      failed.append({'FailedTicker':name})
+      continue
+    if " " in name:
+      name = name.replace(" B-", "-")
 
     # Request for company information
     url1 = "https://api.capitalcube.com/companies/" +name
     resp1 = requests.get(url1)
 
-    if resp1.ok:
+    if resp1.status_code == 200:
       print(resp1)
 
       try:
         data = resp1.json()
       except json.decoder.JSONDecodeError:
-        print("Invalid ticker symbol: " +name)
-        print("Enter valid NASDQ or exchange ticker")
+        print(name, ": failed to retrieve data from CapitalCube")
         failed.append({'FailedTicker':name})
         continue
 
@@ -58,13 +51,13 @@ def retrieve_data(tickerCSV):
       url2 = "https://api.capitalcube.com/companies/" +name +"/peers"
       resp2 = requests.get(url2)
 
-      if resp2.ok:
+      if resp2.status_code == 200:
         print("peers:", resp2)
 
         try:
           peersData = resp2.json()
         except json.decoder.JSONDecodeError:
-          print("Error happened while pulling peers list")
+          print("Error occured while retrieving peers list")
           continue
 
         peersList = []
@@ -84,7 +77,6 @@ def retrieve_data(tickerCSV):
   successDataset.to_csv("SuccessTickers.csv", index=False) # Successful tickers with information csv
 
 def main():
-  # input file (list of Tickers with the header "Tickers")
   retrieve_data("output.csv")
 
 main()

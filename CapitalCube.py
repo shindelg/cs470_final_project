@@ -27,7 +27,7 @@ def retrieve_data(tickerCSV):
   failed = []
 
   for index, name in df.itertuples():
-
+    print(name)
     # TODO Throws error when ticker includes spaces (ex. HM B-SE)
     if "-" not in name:
       print("Incorrect format")

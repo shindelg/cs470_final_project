@@ -97,8 +97,6 @@ crsr.execute("ALTER TABLE NewData ADD COLUMN NaviteCurrency INTEGER;")
 
 crsr.execute("UPDATE NewData SET NaviteCurrency = (SELECT ExchangeRates.ExRate from ExchangeRates WHERE ExchangeRates.Currency = NewData.FinancesCurrency) * MarketCapitalizationInUsd")
 
-#crsr.execute("UPDATE NewData SET MarketCapitalizationInUsd = MarketCapitalizationInUsd")
-
 # Function is to compare two tables within sqlite database
 QueryOne = """SELECT DISTINCT FTData.CompanyId, FTData.CompanyName ,NewData.TickerSymbol, NewData.FinancesCurrency, (SELECT round ((NewData.MarketCapitalizationInUsd * 1000000),2)), (SELECT round ((NewData.NaviteCurrency * 1000000),2)), NewData.AnnualRevenueInUsd, NewData.FinancesCurrentAsOf, NewData.Peers, FTData.MarketCapitalizationInUsd, FTData.AnnualRevenueInUsd
 FROM NewData JOIN FTData

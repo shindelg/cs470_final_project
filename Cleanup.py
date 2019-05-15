@@ -13,7 +13,7 @@ def update_name(filename, tmp):
 # Current time at the start of the script, to keep things consistent
 executionTime = strftime("%Y-%m-%d %H:%M:%S", gmtime())
 
-new_dir = './Version History/Data '
+new_dir = './Version_History/Data '
 new_dir += executionTime
 
 fullpath = os.path.join
@@ -46,8 +46,3 @@ for filename in os.listdir("."):
 
 	elif filename.endswith(".csv"):
 		shutil.move(filename, new_dir)
-
-for filename in os.listdir(new_dir):
-
-	if filename.startswith("Updated"):
-		shutil.copy(filename, "../../")

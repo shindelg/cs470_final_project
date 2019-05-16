@@ -35,7 +35,6 @@ CompanyName VARCHAR(100),
 TickerSymbol VARCHAR(20),
 FinancesCurrency VARCHAR(20),
 MarketCapitalizationInUsd REAL,
-AnnualRevenueInUsd REAL,
 FinancesCurrentAsOf DATETIME,
 Peers VARCHAR(200)
 );"""
@@ -69,7 +68,7 @@ crsr.execute(CreateNewData)
 crsr.execute(CreateExchangeRate)
 
 # This loads the data in from the Scraper csv into the CapitalCubeData Table
-with open('CurrencyConverter.csv', 'rt') as fin:
+with open('ExchangeRates.csv', 'rt') as fin:
     dr = csv.DictReader(fin)
     to_db = [(i['Currency'], i['ExRate']) for i in dr]
 
@@ -84,13 +83,13 @@ comp_ids= crsr.fetchall()
 
 # Filter out relevant data from CapitalCube into our NewData table
 # fiftyTwoWeekLow is a placeholder for when we can actually get the annual revenue of a company
-crsr.execute("SELECT name, symbol, currency, marketCap, fiftyTwoWeekLow, asOfDate, peers FROM CapitalCubeData;")
+crsr.execute("SELECT name, symbol, currency, marketCap, asOfDate, peers FROM CapitalCubeData;")
 
 # Set up the relevant info to be inserted
 other_info= crsr.fetchall()
 
 # Insert the relevant data into NewData
-connection.executemany("INSERT INTO NewData (CompanyName, TickerSymbol, FinancesCurrency, MarketCapitalizationInUsd, AnnualRevenueInUsd, FinancesCurrentAsOf, Peers) VALUES (?,?,?,?,?,?,?)", other_info)
+connection.executemany("INSERT INTO NewData (CompanyName, TickerSymbol, FinancesCurrency, MarketCapitalizationInUsd, FinancesCurrentAsOf, Peers) VALUES (?,?,?,?,?,?)", other_info)
 
 #This alters the table to create a new column
 crsr.execute("ALTER TABLE NewData ADD COLUMN NaviteCurrency INTEGER;")
@@ -100,17 +99,15 @@ crsr.execute("UPDATE NewData SET NaviteCurrency = (SELECT ExchangeRates.ExRate f
 #crsr.execute("UPDATE NewData SET MarketCapitalizationInUsd = MarketCapitalizationInUsd")
 
 # Function is to compare two tables within sqlite database
-QueryOne = """SELECT DISTINCT FTData.CompanyId, FTData.CompanyName ,NewData.TickerSymbol, NewData.FinancesCurrency, (SELECT round ((NewData.MarketCapitalizationInUsd * 1000000),2)), (SELECT round ((NewData.NaviteCurrency * 1000000),2)), NewData.AnnualRevenueInUsd, NewData.FinancesCurrentAsOf, NewData.Peers, FTData.MarketCapitalizationInUsd, FTData.AnnualRevenueInUsd
-FROM NewData JOIN FTData
+QueryOne = """SELECT DISTINCT FTData.CompanyId, FTData.CompanyName ,NewData.TickerSymbol, NewData.FinancesCurrency, (SELECT round ((NewData.MarketCapitalizationInUsd * 1000000),2)), (SELECT round ((NewData.NaviteCurrency * 1000000),2)), NewData.FinancesCurrentAsOf, NewData.Peers, FTData.MarketCapitalizationInUsd FROM NewData JOIN FTData
 WHERE NewData.TickerSymbol = FTData.TickerSymbol
-AND (NewData.MarketCapitalizationInUsd != FTData.MarketCapitalizationInUsd
-OR NewData.AnnualRevenueInUsd != FTData.AnnualRevenueInUsd)
+AND (NewData.MarketCapitalizationInUsd != FTData.MarketCapitalizationInUsd)
 ;"""
 
 #crsr.execute(QueryOne)
 
 # Output to a csv
-fields = ['CompanyId', 'CompanyName', 'TickerSymbol', 'FinancesCurrency', 'Updated MarketCapitalizationInUsd','MarketCapitalization in Native Currency','Updated AnnualRevenueInUsd', 'Upaded FinancesCurrentAsOf', 'Peers', 'Original MarketCapitalizationInUsd', 'Original AnnualRevenueInUsd']
+fields = ['CompanyId', 'CompanyName', 'TickerSymbol', 'FinancesCurrency', 'UpdatedMarketCapitalizationInUsd','MarketCapitalizationInNativeCurrency', 'UpdatedFinancesCurrentAsOf', 'Peers', 'OriginalMarketCapitalizationInUsd']
 toExport = crsr.execute(QueryOne)
 
 with open('UpdatedCompanyInformation.csv', 'w+') as f:

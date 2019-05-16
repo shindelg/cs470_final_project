@@ -17,7 +17,6 @@ CompanyName VARCHAR(100),
 TickerSymbol VARCHAR(20),
 FinancesCurrency VARCHAR(20),
 MarketCapitalizationInUsd INTEGER,
-AnnualRevenueInUsd INTEGER,
 FinancesCurrentAsOf DATETIME
 );"""
 
@@ -32,10 +31,10 @@ crsr.execute(CreateFT)
 # This loads the data in from the ForestTrends csv into the FTData Table
 with open('publicComp.csv', 'rt') as fin:
     dr = csv.DictReader(fin)
-    to_db = [(i['CompanyId'], i['CompanyName'], i['TickerSymbol'], i['FinancesCurrency'], i['MarketCapitalizationInUsd'], i['AnnualRevenueInUsd'], i['FinancesCurrentAsOf']) for i in dr]
+    to_db = [(i['CompanyId'], i['CompanyName'], i['TickerSymbol'], i['FinancesCurrency'], i['MarketCapitalizationInUsd'], i['FinancesCurrentAsOf']) for i in dr]
 
 # Insert values from the ForestTrends csv into the FTData Table
-connection.executemany("INSERT INTO FTData (CompanyId, CompanyName, TickerSymbol, FinancesCurrency,MarketCapitalizationInUsd,AnnualRevenueInUsd, FinancesCurrentAsOf ) VALUES (?,?,?,?,?,?,?);", to_db)
+connection.executemany("INSERT INTO FTData (CompanyId, CompanyName, TickerSymbol, FinancesCurrency, MarketCapitalizationInUsd, FinancesCurrentAsOf ) VALUES (?,?,?,?,?,?);", to_db)
 
 # Create the Tickers table for standardizing ticker symbols
 crsr.execute(CreateTickers)

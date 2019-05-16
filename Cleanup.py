@@ -56,4 +56,5 @@ for filename in os.listdir("."):
 		os.remove(filename)
 
 	elif filename.endswith(".csv"):
-		shutil.move(filename, new_dir)
+		if not filename.startswith("Updated"):
+            shutil.move(filename, new_dir)

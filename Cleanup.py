@@ -1,6 +1,7 @@
 import os, shutil, csv
 
 from time import gmtime, strftime
+from datetime import datetime
 from glob import glob
 
 # Method to update names
@@ -11,10 +12,13 @@ def update_name(filename, tmp):
 	os.rename(filename, new_name)
 
 # Current time at the start of the script, to keep things consistent
-executionTime = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+# executionTime = strftime("%Y-%m-%d %H:%M:%S", gmtime.now())
+now = datetime.now()
+executionTime = now.strftime('%Y-%m-%d %H:%M:%S')
 
 new_dir = './Version_History/Data '
 new_dir += executionTime
+
 
 fullpath = os.path.join
 
@@ -28,7 +32,7 @@ for filename in os.listdir("."):
 
 	elif filename.startswith("Failed"):
 		update_name(filename, "FailedTickers ")
-	
+
 	elif filename.startswith("Success"):
 		update_name(filename, "SuccessTickers ")
 
@@ -37,7 +41,7 @@ for filename in os.listdir("."):
 
 	elif filename.startswith("Updated"):
 		update_name(filename, "UpdatedCompanyInformation ")
-	
+
 # Move files into a subdirectory; remove unnecessary files
 for filename in os.listdir("."):
 

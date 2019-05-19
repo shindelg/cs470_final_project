@@ -107,8 +107,7 @@ NewData.latestAnnualFilingDate, NewData.FinancesCurrentAsOf, NewData.Peers,
 FTData.MarketCapitalizationInUsd, FTData.AnnualRevenueInUsd
 FROM NewData JOIN FTData
 WHERE NewData.TickerSymbol = FTData.TickerSymbol
-AND (NewData.MarketCapitalizationInUsd != FTData.MarketCapitalizationInUsd
-OR NewData.AnnualRevenueInUsd != FTData.AnnualRevenueInUsd)
+AND (NewData.MarketCapitalizationInUsd != FTData.MarketCapitalizationInUsd)
 ;"""
 
 ################################################################################

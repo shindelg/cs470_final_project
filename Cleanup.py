@@ -15,6 +15,13 @@ def update_name(filename, tmp):
 now = datetime.now()
 executionTime = now.strftime('%Y-%m-%d %H:%M:%S')
 
+check_dir = './Version_History'
+
+fullpath1 = os.path.join
+
+if not os.path.exists(check_dir):
+	os.mkdir(check_dir)
+
 new_dir = './Version_History/Data '
 new_dir += executionTime
 

@@ -12,7 +12,6 @@ def update_name(filename, tmp):
 	os.rename(filename, new_name)
 
 # Current time at the start of the script, to keep things consistent
-# executionTime = strftime("%Y-%m-%d %H:%M:%S", gmtime.now())
 now = datetime.now()
 executionTime = now.strftime('%Y-%m-%d %H:%M:%S')
 
